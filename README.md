@@ -6,7 +6,18 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 ![image](https://github.com/RileyMeta/FlatpakManagerLite/assets/32332593/950d8fed-e1c3-471b-8e22-ba863564f17a)
 
 ## How to run
+
+1. Make sure you have all the Requirements installed
+
+1. Clone this Repo
+
+1. cd into the directory 
+
+1. make sure to run with python**3** 
+
 ```bash
+git clone https://github.com/RileyMeta/FlatpakManagerLite
+cd FlatpakManagerLite/
 python3 FlatpakManagerLite.py
 ```
 
