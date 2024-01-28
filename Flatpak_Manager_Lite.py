@@ -11,18 +11,30 @@ class IconLoaderThread(QThread):
 
     def __init__(self, item, app_icon_url):
         super().__init__()
-        self.item = item
-        self.app_icon_url = app_icon_url
+        self._item = item
+        self._app_icon_url = app_icon_url
+        self._icon_pixmap = None
+        self._loaded = False
 
     def run(self):
         try:
-            if self.app_icon_url is not None:
-                icon_data = requests.get(self.app_icon_url).content
+            if not self._loaded and self._app_icon_url is not None:
+                icon_data = requests.get(self._app_icon_url).content
                 icon_pixmap = QPixmap()
                 icon_pixmap.loadFromData(icon_data)
-                self.icon_loaded.emit(self.item, icon_pixmap)
+                self._icon_pixmap = icon_pixmap
+                self._loaded = True
+                self.icon_loaded.emit(self._item, icon_pixmap)
         except Exception as e:
             print(f"Error loading icon: {e}")
+
+    @property
+    def icon_pixmap(self):
+        # This property handles lazy loading of the icon
+        if not self._loaded:
+            self.start()  # Start the thread to load the icon if not loaded yet
+            self.wait()  # Wait for the thread to finish loading
+        return self._icon_pixmap
 
 
 class FlatpakManager(QMainWindow):
@@ -38,7 +50,6 @@ class FlatpakManager(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        # Create widgets
         self.search_bar = QLineEdit(self)
         self.search_bar.setPlaceholderText("Search for packages...")  # Set placeholder text
         self.sort_combobox = QComboBox(self)
