@@ -3,11 +3,12 @@ import subprocess
 import requests
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton, \
     QLabel, QWidget, QListWidgetItem, QLineEdit, QComboBox
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap, QPalette, QColor
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QThreadPool
 
 class IconLoaderThread(QThread):
     icon_loaded = pyqtSignal(QListWidgetItem, QPixmap)
+    terminated = pyqtSignal()
 
     def __init__(self, item, app_icon_url):
         super().__init__()
@@ -27,6 +28,8 @@ class IconLoaderThread(QThread):
                 self.icon_loaded.emit(self._item, icon_pixmap)
         except Exception as e:
             print(f"Error loading icon: {e}")
+        self.terminated.emit()
+
 
     @property
     def icon_pixmap(self):
@@ -40,6 +43,7 @@ class IconLoaderThread(QThread):
 class FlatpakManager(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.thread_pool = QThreadPool()
 
         self.setWindowTitle("Flatpak Manager Lite")
         self.setGeometry(100, 100, 800, 600)
@@ -50,16 +54,36 @@ class FlatpakManager(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
+        app.setStyle('Fusion')
+
+        # Set a dark color palette
+        dark_palette = QPalette()
+        dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.WindowText, Qt.white)
+        dark_palette.setColor(QPalette.Base, QColor(25, 25, 25))
+        dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
+        dark_palette.setColor(QPalette.ToolTipText, Qt.white)
+        dark_palette.setColor(QPalette.Text, Qt.white)
+        dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ButtonText, Qt.white)
+        dark_palette.setColor(QPalette.BrightText, Qt.red)
+        dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.HighlightedText, Qt.black)
+
+        app.setPalette(dark_palette)
+
         self.search_bar = QLineEdit(self)
         self.search_bar.setPlaceholderText("Search for packages...")  # Set placeholder text
         self.sort_combobox = QComboBox(self)
         self.sort_combobox.addItem("Sort by Name")
         self.sort_combobox.addItem("Sort by Alpha-Numeric Name")
         self.app_list = QListWidget(self)
+        self.status_label = QLabel("", self)
         self.install_button = QPushButton("Install Selected", self)
         self.uninstall_button = QPushButton("Uninstall Selected", self)
         self.update_button = QPushButton("Update Selected", self)
-        self.status_label = QLabel("", self)
 
         # Connect signals
         self.install_button.clicked.connect(self.install_selected)
@@ -76,10 +100,10 @@ class FlatpakManager(QMainWindow):
         main_layout.addWidget(self.search_bar)
         main_layout.addLayout(button_layout)
         main_layout.addWidget(self.app_list)
+        main_layout.addWidget(self.status_label)
         button_layout.addWidget(self.install_button)
         button_layout.addWidget(self.uninstall_button)
         button_layout.addWidget(self.update_button)
-        main_layout.addWidget(self.status_label)
 
         # Set central widget
         central_widget = QWidget()
@@ -178,8 +202,18 @@ class FlatpakManager(QMainWindow):
         for icon_loader in self.icon_loaders:
             icon_loader.quit()
             icon_loader.wait()
+        self.thread_pool.waitForDone()
         event.accept()
 
+    def remove_thread(self):
+        thread = self.sender()
+        self.icon_loaders.remove(thread)
+
+    def load_icon(self):
+        icon_loader = IconLoader()
+        icon_loader.terminated.connect(self.remove_thread)
+        self.thread_pool.start(icon_loader)
+        self.icon_loaders.append(icon_loader)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
