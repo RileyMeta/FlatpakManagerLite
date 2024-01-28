@@ -27,6 +27,8 @@ python3 FlatpakManagerLite.py
 - Python3
 - PyQT5
 - requests (Python Module)
+- Flatpak
+- Flathub
 
 ## Included Binary
 The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/stable/)
