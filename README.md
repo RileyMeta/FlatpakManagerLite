@@ -61,7 +61,7 @@ The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/st
 > If you open the front-end via a terminal you can watch the flatpak commands at work. 
 
 ## Goals: 
-- [ ] Improve Loading Times (Impliment Lazy Loading)
+- [x] ~~Improve Loading Times (Impliment Lazy Loading)~~
 - [ ] Add additional sorting options in the combobox
 - [ ] Add a Cancel button
 - [ ] Add a default time-out for status text to auto-clear
