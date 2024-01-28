@@ -49,5 +49,7 @@ The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/st
 - It takes a while to load (This is an issue with GTK, I haven't tried to fix it yet)
 - Switching back to Sort by Name does nothing.
 - You can't cancel anything once it's started (unless you close the app)
+- Status Text in the bottom left doesn't update or clear
+- App Freezes when installing larger apps (Parallelization is not enabled)
 
 > If you open the front-end via a terminal you can watch the flatpak commands at work. 
