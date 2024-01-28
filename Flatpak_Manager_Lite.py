@@ -59,15 +59,15 @@ class FlatpakManager(QMainWindow):
 
         # Set up layout
         button_layout = QHBoxLayout()
-        button_layout.addWidget(self.install_button)
-        button_layout.addWidget(self.uninstall_button)
-        button_layout.addWidget(self.update_button)
         button_layout.addWidget(self.sort_combobox)
         button_layout.addStretch()  # Add stretch to make spacing even
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.search_bar)
         main_layout.addLayout(button_layout)
         main_layout.addWidget(self.app_list)
+        button_layout.addWidget(self.install_button)
+        button_layout.addWidget(self.uninstall_button)
+        button_layout.addWidget(self.update_button)
         main_layout.addWidget(self.status_label)
 
         # Set central widget
