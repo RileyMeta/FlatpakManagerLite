@@ -7,7 +7,7 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 
 ## How to run
 
-1. Make sure you have all the Requirements installed
+1. Make sure you have all the [Requirements](https://github.com/RileyMeta/FlatpakManagerLite/blob/main/README.md#requirements--dependancies) installed
 
 1. Clone this Repo
 
