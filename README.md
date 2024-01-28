@@ -26,6 +26,7 @@ python3 FlatpakManagerLite.py
 ## Requirements / Dependancies
 - Python3
 - PyQT5
+- *Slackware* - python3-pyqt-distutils
 - requests (Python Module)
 - Flatpak
 - Flathub
