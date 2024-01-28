@@ -3,7 +3,8 @@
 After a recent escapade into Slackware I thought it would be fun to get Flatpak working, which wasn't difficult. The annoying part came when I tried to compile Gnome-Software, KDE-Discover and a few others just to find out they either required SystemD, or had far too many dependancies for me to feel safe. Not to mention the amount of time it took compiling just to find out it needed something I couldn't get. So I decided to make a simple front-end in Python. 
 
 > This whole project is a single file. 
-![image](https://github.com/RileyMeta/FlatpakManagerLite/assets/32332593/07baa860-ed71-4e51-ba41-d16c16f214b0)
+![image](https://github.com/RileyMeta/FlatpakManagerLite/assets/32332593/6f68b8e1-0f9b-4cb8-8bba-a754f43144fe)
+
 
 ## What this app can do
 - Pull the current list of available apps from Flathub
@@ -67,4 +68,4 @@ The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/st
 - [ ] Add a default time-out for status text to auto-clear
 - [ ] Add a Status Bar for Installations?
 - [ ] Add Parallelization for multiple simultaneous downloads
-- [ ] Improve Visual Design of App
+- [x] ~~Improve Visual Design of App~~ (Darkmode Added)
