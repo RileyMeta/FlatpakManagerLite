@@ -13,10 +13,11 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 - - Their Description
 - - Flatpak ID (used only for (un)installing/upgrades)
 - A Search bar to find specific packages
-- An auto-Install button
-- An auto-Uninstall button
-- An auto-Update button
 - An *unfinished toggle for Default and Alpha-numeric sorting
+- Auto-invocation of Flatpak Commands through Python Subprocesses
+- - An auto-Install button
+- - An auto-Uninstall button
+- - An auto-Update button
 
 ## Build from Source
 
