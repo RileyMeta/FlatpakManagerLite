@@ -5,8 +5,20 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 > This whole project is a single file. 
 ![image](https://github.com/RileyMeta/FlatpakManagerLite/assets/32332593/07baa860-ed71-4e51-ba41-d16c16f214b0)
 
+## What this app can do
+- Pull the current list of available apps from Flathub
+- Display in list-form all of the apps, including
+- - Their Icon
+- - Their Name
+- - Their Description
+- - Flatpak ID (used only for (un)installing/upgrades)
+- A Search bar to find specific packages
+- An auto-Install button
+- An auto-Uninstall button
+- An auto-Update button
+- An *unfinished toggle for Default and Alpha-numeric sorting
 
-## How to run
+## Build from Source
 
 1. Make sure you have all the [Requirements](https://github.com/RileyMeta/FlatpakManagerLite/blob/main/README.md#requirements--dependancies) installed
 
@@ -21,19 +33,6 @@ git clone https://github.com/RileyMeta/FlatpakManagerLite
 cd FlatpakManagerLite/
 python3 FlatpakManagerLite.py
 ```
-
-## What this app can do
-- Pull the current list of available apps from Flathub
-- Display in list-form all of the apps, including
-- - Their Icon
-- - Their Name
-- - Their Description
-- - Flatpak ID (used only for (un)installing/upgrades)
-- A Search bar to find specific packages
-- An auto-Install button
-- An auto-Uninstall button
-- An auto-Update button
-- An *unfinished toggle for Default and Alpha-numeric sorting
 
 ## Requirements / Dependancies
 - Python3
