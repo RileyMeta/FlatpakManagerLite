@@ -21,7 +21,7 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 
 ## Build from Source
 
-1. Make sure you have all the [Requirements](https://github.com/RileyMeta/FlatpakManagerLite/blob/main/README.md#requirements--dependancies) installed
+1. Make sure you have all the Requirements installed
 
 1. Clone this Repo
 
@@ -35,13 +35,18 @@ cd FlatpakManagerLite/
 python3 FlatpakManagerLite.py
 ```
 
-## Requirements / Dependancies
+## Build Requirements
+- Python3
+- Pip
+- - Pyqt5
+- - requests (Python Module for Flathub API)
+- - (optional) Pyinstall (for building Binaries)
+
+## Run Requirements
 - Python3
 - PyQT5
-- *Slackware* - python3-pyqt-distutils
-- requests (Python Module)
+- (Slackware) - python3-pyqt-distutils
 - Flatpak
-- Flathub
 
 ## Included Binary
 The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/stable/)
@@ -62,3 +67,4 @@ The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/st
 - [ ] Add a default time-out for status text to auto-clear
 - [ ] Add a Status Bar for Installations?
 - [ ] Add Parallelization for multiple simultaneous downloads
+- [ ] Improve Visual Design of App
