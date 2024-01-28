@@ -5,6 +5,11 @@ After a recent escapade into Slackware I thought it would be fun to get Flatpak 
 > This whole project is a single file. 
 ![image](https://github.com/RileyMeta/FlatpakManagerLite/assets/32332593/950d8fed-e1c3-471b-8e22-ba863564f17a)
 
+## How to run
+```bash
+python3 FlatpakManagerLite.py
+```
+
 ## What this app can do
 - Pull the current list of available apps from Flathub
 - Display in list-form all of the apps, including
