@@ -155,33 +155,49 @@ def main():
 
         def install_selected(self):
             selected_item = self.app_list.currentItem()
-            if selected_item:
-                flatpak_id = selected_item.data(Qt.UserRole)
-                self.run_flatpak_command(f"install {flatpak_id} -y")
-                self.timer.start(15000)
+            try:
+                if selected_item:
+                    flatpak_id = selected_item.data(Qt.UserRole)
+                    self.run_flatpak_command(f"install {flatpak_id} -y")
+                    self.status_label.setText(f"Installation Successful!")
+                    self.timer.start(10000)
+            except subprocess.CalledProcessError as e:
+                self.status_label.setText(f"{status_message} failed. Error: {e}")
+                self.timer.start(10000)
 
         def uninstall_selected(self):
             selected_item = self.app_list.currentItem()
-            if selected_item:
-                flatpak_id = selected_item.data(Qt.UserRole)
-                self.run_flatpak_command(f"uninstall {flatpak_id} -y")
-                self.timer.start(15000)
+            try:
+                if selected_item:
+                    flatpak_id = selected_item.data(Qt.UserRole)
+                    self.run_flatpak_command(f"uninstall {flatpak_id} -y")
+                    self.status_label.setText(f"App successfully uninstalled!")
+                    self.timer.start(10000)
+            except subprocess.CalledProcessError as e:
+                self.status_label.setText(f"{status_message} failed. Error: {e}")
+                self.timer.start(10000)
 
-        def update_selected(self):  
+        def update_selected(self):
             selected_item = self.app_list.currentItem()
-            if selected_item:
-                flatpak_id = selected_item.data(Qt.UserRole)
-                self.run_flatpak_command(f"update {flatpak_id} -y")
-                self.timer.start(15000)
+            try:
+                if selected_item:
+                    flatpak_id = selected_item.data(Qt.UserRole)
+                    self.run_flatpak_command(f"update {flatpak_id} -y")
+                    self.status_label.setText(f"Update successful!")
+                    self.timer.start(10000)
+            except subprocess.CalledProcessError as e:
+                self.status_label.setText(f"{status_message} failed. Error: {e}")
+                self.timer.start(10000)
 
         def run_flatpak_command(self, command, status_message=""):
             try:
                 subprocess.run(["flatpak"] + command.split(), check=True)
                 if status_message:
                     self.status_label.setText(f"{status_message} succeeded.")
-                    self.timer.start(15000)
+                    self.timer.start(10000)
             except subprocess.CalledProcessError as e:
                 self.status_label.setText(f"{status_message} failed. Error: {e}")
+                self.timer.start(10000)
 
         def clear_output(self):
             self.status_label.clear()
