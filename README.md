@@ -63,9 +63,10 @@ The included Binary was created with [Pyinstaller](https://pyinstaller.org/en/st
 
 ## Goals: 
 - [x] ~~Improve Loading Times (Impliment Lazy Loading)~~
+- [ ] Fix Canberra-GTK-Module issues
 - [ ] Add additional sorting options in the combobox
 - [ ] Add a Cancel button
-- [ ] Add a default time-out for status text to auto-clear
+- [x] ~~Add a default time-out for status text to auto-clear~~
 - [ ] Add a Status Bar for Installations?
-- [ ] Add Parallelization for multiple simultaneous downloads
+- [ ] Add Parallelization for multiple simultaneous downloads? (Might not be possible)
 - [x] ~~Improve Visual Design of App~~ (Darkmode Added)
