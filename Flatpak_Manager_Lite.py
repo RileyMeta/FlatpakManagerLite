@@ -3,7 +3,7 @@ import subprocess
 import requests
 import cProfile
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton, \
-    QLabel, QWidget, QListWidgetItem, QLineEdit, QComboBox
+    QLabel, QWidget, QListWidgetItem, QLineEdit, QComboBox, QMessageBox
 from PyQt5.QtGui import QIcon, QPixmap, QPalette, QColor
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QThreadPool, QTimer
 
@@ -44,6 +44,7 @@ def main():
 
 
     class FlatpakManager(QMainWindow):
+        MAX_RETRIES = 3
         def __init__(self):
             super().__init__()
             self.thread_pool = QThreadPool()
@@ -119,36 +120,56 @@ def main():
             # Load Flatpak applications from Flathub API
             self.load_flatpak_apps()
 
+        def show_error_message(self, title, message):
+                error_box = QMessageBox(self)
+                error_box.setIcon(QMessageBox.Critical)
+                error_box.setWindowTitle(title)
+                error_box.setText(message)
+                error_box.exec_()
+
         def load_flatpak_apps(self):
             # Fetch the list of Flatpak applications from Flathub API
             url = "https://flathub.org/api/v1/apps"
             response = requests.get(url)
+            retries = 0
+            while retries < self.MAX_RETRIES:
+                try:
+                    response = requests.get(url)
+                    response.raise_for_status()
+                    apps_data = response.json()
+                    for app_data in apps_data:
+                        app_name = app_data["name"]
+                        app_summary = app_data["summary"]
+                        app_icon_url = app_data["iconDesktopUrl"]
+                        flatpak_id = app_data["flatpakAppId"]
 
-            if response.status_code == 200:
-                apps_data = response.json()
-                for app_data in apps_data:
-                    app_name = app_data["name"]
-                    app_summary = app_data["summary"]
-                    app_icon_url = app_data["iconDesktopUrl"]
-                    flatpak_id = app_data["flatpakAppId"]
+                        # Add the application to the QListWidget
+                        item = QListWidgetItem()
+                        item.setText(f"{app_name} - {app_summary}")
+                        item.setData(Qt.UserRole, flatpak_id)  # Store Flatpak ID in item data
 
-                    # Add the application to the QListWidget
-                    item = QListWidgetItem()
-                    item.setText(f"{app_name} - {app_summary}")
-                    item.setData(Qt.UserRole, flatpak_id)  # Store Flatpak ID in item data
+                        # Use a separate thread to load icons asynchronously
+                        icon_loader = IconLoaderThread(item, app_icon_url)
+                        icon_loader.icon_loaded.connect(self.set_icon)
+                        icon_loader.finished.connect(icon_loader.deleteLater)  # Clean up the thread
+                        icon_loader.start()
 
-                    # Use a separate thread to load icons asynchronously
-                    icon_loader = IconLoaderThread(item, app_icon_url)
-                    icon_loader.icon_loaded.connect(self.set_icon)
-                    icon_loader.finished.connect(icon_loader.deleteLater)  # Clean up the thread
-                    icon_loader.start()
+                        # Store the thread object in a list
+                        self.icon_loaders.append(icon_loader)
 
-                    # Store the thread object in a list
-                    self.icon_loaders.append(icon_loader)
+                        self.app_list.addItem(item)
 
-                    self.app_list.addItem(item)
-            else:
-                self.status_label.setText("Error fetching Flatpak apps from Flathub API")
+                    return  # Exit the function if successful
+                except requests.RequestException as e:
+                    retries += 1
+                    error_message = f"Error fetching Flatpak apps from Flathub API: {e}"
+                    self.status_label.setText(error_message)
+                    self.show_error_message("Error", error_message)
+                    if retries < self.MAX_RETRIES:
+                        # Sleep for a short duration before retrying
+                        QTimer.singleShot(1000, lambda: None)
+                    else:
+                        self.close_app_on_error()
 
         def set_icon(self, item, pixmap):
             item.setIcon(QIcon(pixmap))
@@ -159,11 +180,12 @@ def main():
                 if selected_item:
                     flatpak_id = selected_item.data(Qt.UserRole)
                     self.run_flatpak_command(f"install {flatpak_id} -y")
-                    self.status_label.setText(f"Installation Successful!")
-                    self.timer.start(10000)
+                    self.timer.start(5000)
             except subprocess.CalledProcessError as e:
-                self.status_label.setText(f"{status_message} failed. Error: {e}")
-                self.timer.start(10000)
+                error_message = f"Application already Installed. Error: {e}"
+                self.status_label.setText(error_message)
+                self.show_error_message("Error", error_message)
+                self.timer.start(5000)
 
         def uninstall_selected(self):
             selected_item = self.app_list.currentItem()
@@ -171,11 +193,12 @@ def main():
                 if selected_item:
                     flatpak_id = selected_item.data(Qt.UserRole)
                     self.run_flatpak_command(f"uninstall {flatpak_id} -y")
-                    self.status_label.setText(f"App successfully uninstalled!")
-                    self.timer.start(10000)
+                    self.timer.start(5000)
             except subprocess.CalledProcessError as e:
-                self.status_label.setText(f"{status_message} failed. Error: {e}")
-                self.timer.start(10000)
+                error_message = f"Application not Installation. Error: {e}"
+                self.status_label.setText(error_message)
+                self.show_error_message("Error", error_message)
+                self.timer.start(5000)
 
         def update_selected(self):
             selected_item = self.app_list.currentItem()
@@ -183,21 +206,31 @@ def main():
                 if selected_item:
                     flatpak_id = selected_item.data(Qt.UserRole)
                     self.run_flatpak_command(f"update {flatpak_id} -y")
-                    self.status_label.setText(f"Update successful!")
-                    self.timer.start(10000)
+                    self.timer.start(5000)
             except subprocess.CalledProcessError as e:
-                self.status_label.setText(f"{status_message} failed. Error: {e}")
-                self.timer.start(10000)
+                error_message = f"Update failed. Error: {e}"
+                self.status_label.setText(error_message)
+                self.show_error_message("Error", error_message)
+                self.timer.start(5000)
 
         def run_flatpak_command(self, command, status_message=""):
-            try:
-                subprocess.run(["flatpak"] + command.split(), check=True)
-                if status_message:
-                    self.status_label.setText(f"{status_message} succeeded.")
-                    self.timer.start(10000)
-            except subprocess.CalledProcessError as e:
-                self.status_label.setText(f"{status_message} failed. Error: {e}")
-                self.timer.start(10000)
+                try:
+                    process = subprocess.Popen(["flatpak"] + command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    while process.poll() is None:
+                        QApplication.processEvents()  # Allow the application to handle events
+                    output, error = process.communicate()
+
+                    if process.returncode == 0:
+                        self.status_label.setText(f"{status_message} succeeded.")
+                    else:
+                        error_message = f"{status_message} failed. Error: {error}"
+                        self.status_label.setText(error_message)
+                        self.show_error_message("Error", error_message)
+                except Exception as e:
+                    error_message = f"Error: {e}"
+                    self.status_label.setText(error_message)
+                    self.show_error_message("Error", error_message)
+
 
         def clear_output(self):
             self.status_label.clear()
